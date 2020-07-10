@@ -1,0 +1,69 @@
+#include"Yuv444ToRGB.h"
+#include<stdio.h>
+#include <math.h>
+/*This function is used to convert Yuv444 to RGB888
+ *Parameters: RGBBuff-> Containing Y,U,V values to process
+ 	      Width of Image
+ 	      Height of Image	  
+
+ *Returns: Nothing
+*/
+#define FACTOR (int32_t)1024
+#define FIXED(X) X*1024
+
+void Yuv444ToRGB(uint8_t RGBBuff[],int width,int height){
+
+ 	int32_t c=0,d=0,e=0,R=0,G=0,B=0;
+ 	int i=0;
+
+ 	float a1,b1,c1,d1;
+ 	a1=FIXED(1.402);
+ 	b1=FIXED(0.344);
+ 	c1=FIXED(0.714);
+ 	d1=FIXED(1.772);
+ 	 // a1=1402;
+ 	 // b1=344;
+ 	 // c1=714;
+ 	 // d1=1772;
+ 	printf("a1=%d",a1);	
+ 	printf("b1=%d",b1);	
+ 	printf("c1=%d",c1);	
+ 	printf("d1=%d",d1);	
+
+ 	for(i=0;i<(width*height*3);i=i+3){
+ 		c=RGBBuff[i];
+ 		d=RGBBuff[i+1];
+ 		e=RGBBuff[i+2];
+ 		/*formal Used for the conversion of YUV To RGB*/
+ 		// RGBBuff[i]=clamp(c+(1.402*(e-128)));
+ 		// RGBBuff[i+1]=clamp(c-0.344*(d-128)-0.714*(e-128));
+ 		// RGBBuff[i+2]=clamp(c+1.772*(d-128));
+		
+		RGBBuff[i]=clamp(c+((a1*(e-128))/FACTOR)) -1;
+ 		RGBBuff[i+1]=clamp(c-((b1*(d-128))/FACTOR)-((c1*(e-128))/FACTOR)) -1;
+ 		// RGBBuff[i+1]=clamp(c-(( b1*(d-128) - c1*(e-128))  >>FACTOR) );
+ 		RGBBuff[i+2]=clamp(c+((d1*(d-128))/FACTOR)) -1;
+
+
+ 	}
+
+ }
+
+/*Clamp funtion is used to limit values of RGB between (0,255)
+ *Parameter: Values of R/G/B
+
+ *Returns:clampled values of R/G/B
+
+*/
+
+uint8_t clamp(int16_t ch){
+ // printf("ch=%d\n",ch);
+
+if(ch>255)
+	return 255;
+if(ch<0)
+	return 1;
+
+return ch;
+
+}
